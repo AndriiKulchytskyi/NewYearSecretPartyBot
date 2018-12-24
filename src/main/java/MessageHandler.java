@@ -7,24 +7,25 @@ public class MessageHandler {
         int max = 4;
         int number = 0;
         boolean numberIsNotFound = true;
+
         while (numberIsNotFound) {
-            number = (int) ((Math.random() * (max - min)))+1;
-            if (!GlobalVars.usersWithNumbers.containsValue(number)) {
-                numberIsNotFound = false;
+            number = (int) ((Math.random() * (max - min)))+1;//generate
+            if (GlobalVars.mongoConnector.returnGroupSize(number)<3) {//if group with that number has <3 people
+                numberIsNotFound = false;//end while
             }
         }
-        GlobalVars.usersWithNumbers.put(id, number);
-        GlobalVars.usersNamesWithNumbers.put(name, number);
+
+        GlobalVars.mongoConnector.saveMessage(id,name,number);
         return "You receive number " + number;
     }
 
     public static String handleTypicalAnswer(Integer id, String name) {
         StringBuilder names = new StringBuilder();
-        for (String key:GlobalVars.usersNamesWithNumbers.keySet()){
+        for (String key:GlobalVars.mongoConnector.returnNamesInGroup(GlobalVars.mongoConnector.returnGroupNumberByName(name))){
             names.append(key+",");
         }
         names.append("\n");
-        return name + ", your number " + GlobalVars.usersWithNumbers.get(id) + "\nIn your group:"
+        return name + ", your number " + GlobalVars.mongoConnector.returnGroupNumberByName(name) + "\nIn your group:"
                 +names
                 +"You cannot change it.\nAsk for /help";
     }

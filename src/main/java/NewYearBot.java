@@ -14,7 +14,7 @@ public class NewYearBot extends TelegramLongPollingBot {
 
         if (update.hasMessage() && update.getMessage().hasText()) {
             from = update.getMessage().getFrom();
-            if (GlobalVars.usersWithNumbers.containsKey(from.getId())) {
+            if (GlobalVars.mongoConnector.returnAllIds().contains(from.getId().toString())){//if already exist
                 if(update.getMessage().getText().equals("/help")){
                     sendMsg(update.getMessage().getChatId(),MessageHandler.handleHelp());
                 } else{
