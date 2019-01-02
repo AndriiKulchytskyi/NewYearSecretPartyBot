@@ -10,6 +10,7 @@ public class Core {
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
         try {
             telegramBotsApi.registerBot(new NewYearBot());
+
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }

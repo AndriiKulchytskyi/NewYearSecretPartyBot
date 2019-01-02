@@ -9,25 +9,31 @@ public class NewYearBot extends TelegramLongPollingBot {
     User from;
 
     public void onUpdateReceived(Update update) {
-
-        //ToDo Database
-
         if (update.hasMessage() && update.getMessage().hasText()) {
-            from = update.getMessage().getFrom();
-            if (GlobalVars.mongoConnector.returnAllIds().contains(from.getId().toString())){//if already exist
-                if(update.getMessage().getText().equals("/help")){
-                    sendMsg(update.getMessage().getChatId(),MessageHandler.handleHelp());
-                } else{
-                    sendMsg(update.getMessage().getChatId(),MessageHandler.handleTypicalAnswer(from.getId(), from.getFirstName()));
-               }
+            from = saveUser(update.getMessage().getFrom());
+            if (GlobalVars.mongoConnector.returnAllIds().contains(from.getId().toString())) {//if already exist
+                if (update.getMessage().getText().equals("/help")) {
+                    sendMsg(update.getMessage().getChatId(), MessageHandler.handleHelp());
+                } else {
+                    sendMsg(update.getMessage().getChatId(), MessageHandler.handleTypicalAnswer(from.getId(), from.getFirstName()));
+                }
             } else {
-                sendMsg(update.getMessage().getChatId(),MessageHandler.handle(from.getId(), from.getFirstName()));
+                sendMsg(update.getMessage().getChatId(), MessageHandler.handle(from.getId(), from.getFirstName()));
             }
         }
     }
 
+    private User saveUser(User from) {
+        if(GlobalVars.mongoConnector.saveUser(from)){
+            System.out.println(from.getFirstName()+from.getLastName()+" saved.");
+        }
+        else
+            System.out.println("Mongo didn't save the user.");
+        return from;
+    }
 
-    public void sendMsg(Long chatId, String text){
+
+    public void sendMsg(Long chatId, String text) {
         try {
             execute(new SendMessage()
                     .setChatId(chatId)
